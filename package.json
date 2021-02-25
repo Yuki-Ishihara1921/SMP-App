@@ -8,7 +8,12 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "bootstrap-icons-vue": "^0.5.0",
+    "bootstrap-vue": "^2.21.2",
     "core-js": "^3.6.5",
+    "firebase": "^8.2.7",
+    "firebase-tools": "^9.4.0",
+    "google-maps-api-loader": "^1.1.1",
     "vue": "^3.0.0"
   },
   "devDependencies": {
