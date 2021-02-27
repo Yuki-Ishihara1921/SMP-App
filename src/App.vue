@@ -14,14 +14,18 @@ export default {
 </script>
 
 <style>
-body {
-  background: floralwhite !important;
-}
-
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #2c3e50;
+}
+
+body {
+  background: floralwhite !important;
+}
+
+.btn {
+  box-shadow: 0px 1px 0px 2px #555;
 }
 </style>

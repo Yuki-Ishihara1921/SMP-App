@@ -3,12 +3,11 @@
     <main>
         <div class="pageMain_inputs container">
             <div class="d-flex py-3">
-                <h5 class="m-auto font-weight-bold text-primary">
+                <h6 class="m-auto font-weight-bold text-primary">
                     <span><BIconSearch /></span>
-                    地点入力
-                    <span><BIconSearch /></span>
-                </h5>
-                <button class="btn btn-info btn-sm px-3" id="search">
+                    地名・住所を入力
+                </h6>
+                <button class="btn btn-info btn-sm px-3" @click="showResult()">
                     <span><BIconSearch /></span>
                     検索
                 </button>
@@ -39,7 +38,8 @@ export default {
     data () {
         return {
             google: null,
-            map: null
+            map: null,
+            middleLatLng: {}
         }
     },
     async mounted () {
@@ -53,96 +53,123 @@ export default {
             },
             zoom: 10
         })
-        this.initMap()
     },
     methods: {
-        initMap () {
-            let locations = []
-            const geocoder = new this.google.maps.Geocoder()
-            // 検索クリック後
-            document.getElementById('search').addEventListener('click', function () {
-                // 配列初期化
-                locations = []
-                // 取得した地点の値をgeocodingしlocationsに収納
-                function getLocation (inputId) {
-                    let place = document.getElementById(inputId).value
-                    geocoder.geocode({address: place}, function (results, status) {
-                        if (status === this.google.maps.GeocoderStatus.OK) {
-                            let location = []
-                            // 入力値を取得
-                            location.push(place)
-                            // 緯度経度を取得
-                            let latlng = results[0].geometry.location
-                            location.push(latlng)
-                            // 住所を取得
-                            let address = results[0].formatted_address
-                            location.push(address)
-                            locations.push(location)
-                        }
-                    })
+        getInputPlaces () {
+            const inputPlaces = []
+            const inputs = ['input1', 'input2', 'input3', 'input4']
+            for (let i = 0; i < inputs.length; i++) {
+                const place = document.getElementById(inputs[i]).value
+                if (place) {
+                    inputPlaces.push(place)
                 }
-                // input1~4のgeocoding
-                getLocation('input1')
-                getLocation('input2')
-                getLocation('input3')
-                getLocation('input4')
+            }
+            return inputPlaces
+        },
 
-                // マーカー設置処理
-                setTimeout(function () {
-                    let marker
-                    let infoWindow
-                    let latSum = 0
-                    let lngSum = 0
-                    if (locations.length >= 2) {
-                        // 検索数に応じ、中間地点の緯度・経度を算出し、赤マーカーで表示
-                        for (let i = 0; i < locations.length; i++) {
-                        // 検索地点の各緯度・経度の合計値を取得
-                            latSum += parseFloat(locations[i][1].lat())
-                            lngSum += parseFloat(locations[i][1].lng())
+        geocodePlaces (showResult) {
+            const locations = []
+            const places = this.getInputPlaces()
+            const geocoder = new this.google.maps.Geocoder()
+            if (places.length < 2) {
+                alert("２つ以上入力して下さい。")
+                return false
+            }
+            for (let i = 0; i < places.length; i++) {
+                geocoder.geocode({address: places[i]}, function (results, status) {
+                    if (status === this.google.maps.GeocoderStatus.OK) {
+                        const locationData = {
+                            place: places[i],
+                            address: results[0].formatted_address,
+                            lat: results[0].geometry.location.lat(),
+                            lng: results[0].geometry.location.lng()
                         }
-                        // 緯度・経度の各平均値を算出
-                        let middleLat = parseFloat(latSum) / locations.length
-                        let middleLng = parseFloat(lngSum) / locations.length
-                        // 平均値を中間地点とし、地図の中央にマーカー表示
-                        this.map = new this.google.maps.Map(document.getElementById('map'), {
-                            center: {lat: middleLat, lng: middleLng}
-                        })
-                        marker = new this.google.maps.Marker({
-                            position: {lat: middleLat, lng: middleLng},
-                            map: this.map
-                        })
-                        infoWindow = new this.google.maps.InfoWindow({
-                            content: '<span style="color: red; font-size: 15px; font-weight: bold;">中間地点</span>'
-                        })
-                        infoWindow.open(this.map, marker)
-                        marker.addListener('click', function() {
-                            infoWindow.open(this.map, marker)
-                        });
-                        // 検索地点を青マーカーで表示し、画面内に収める
-                        let bounds = new this.google.maps.LatLngBounds()
-                        for (let i = 0; i < locations.length; i++) {
-                            let iconUrl = 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
-                            let locationsMarker = new this.google.maps.Marker({
-                                position: new this.google.maps.LatLng(locations[i][1].lat(), locations[i][1].lng()),
-                                map: this.map,
-                                icon: iconUrl
-                            })
-                            bounds.extend(locationsMarker.position)
-                            // 検索地点の詳細をマーカークリック時に表示
-                            let locationsInfoWindow = new this.google.maps.InfoWindow()
-                            this.google.maps.event.addListener(locationsMarker, 'click', (function (locationsMarker, i) {
-                                return function () {
-                                    locationsInfoWindow.setContent('<a href=http://www.google.com/search?q=' + locations[i][0] + ' target="_blank">' + locations[i][0] + '</a><br><br>' + locations[i][2])
-                                    locationsInfoWindow.open(this.map, locationsMarker)
-                                }
-                            })(locationsMarker, i))
-                        }
-                        this.map.fitBounds(bounds)
+                        locations.push(locationData)
+                        showResult(locations)
                     } else {
-                        alert('検索できませんでした。\n\n場所の名前は正しいか、２つ以上入力しているか確認して下さい。')
+                        alert("「" + places[i] + "」" + "は正しい地名ではありません。")
+                        return false
                     }
-                }, 700)
+                })
+            }
+        },
+
+        getMiddleLatLng (locations) {
+            let latSum = 0
+            let lngSum = 0
+
+            // 検索地点の各緯度・経度の合計値取得
+            for (let i = 0; i < locations.length; i++) {
+                latSum += locations[i].lat
+                lngSum += locations[i].lng
+            }
+
+            // 緯度・経度の各平均値を設定
+            const middleLatLng = {
+                lat: latSum / locations.length,
+                lng: lngSum / locations.length
+            }
+            return middleLatLng
+        },
+
+        showResultMarker (middleLatLng) {
+            const googleMap = this.google.maps
+
+            // 地図の中央に中間地点をセット
+            this.map = new googleMap.Map(document.getElementById('map'), {
+                center: middleLatLng
             })
+            // 中間地点にマーカーをセット
+            const resultMarker = new googleMap.Marker({
+                position: middleLatLng,
+                animation: googleMap.Animation.DROP,
+                map: this.map,
+            })
+
+            // 中間地点にウィンドウを表示
+            const resultInfoWindow = new googleMap.InfoWindow({
+                content: '<span style="color: red; font-size: 15px; font-weight: bold;">中間地点</span>'
+            })
+            resultInfoWindow.open(this.map, resultMarker)
+            resultMarker.addListener('click', function() {
+                resultInfoWindow.open(this.map, resultMarker)
+            })
+        },
+
+        showInputMarkers (locations) {
+        // 検索地点を青マーカーで表示し、画面内に収める
+            const googleMap = this.google.maps
+            const bounds = new googleMap.LatLngBounds()
+            const blueIcon = 'http://maps.google.com/mapfiles/ms/icons/blue-dot.png'
+            for (let i = 0; i < locations.length; i++) {
+                const inputMarker = new googleMap.Marker({
+                    position: {lat: locations[i].lat, lng: locations[i].lng},
+                    animation: googleMap.Animation.DROP,
+                    map: this.map,
+                    icon: blueIcon
+                })
+                bounds.extend(inputMarker.position)
+
+                // 青マーカークリック時に検索地点名表示
+                const inputsInfoWindow = new googleMap.InfoWindow()
+                inputMarker.addListener('click', function() {
+                    inputsInfoWindow.setContent(
+                        '<a href=http://www.google.com/search?q=' + locations[i].place + ' target="_blank" style="font-weight: bold">' + locations[i].place
+                    )
+                    inputsInfoWindow.open(this.map, inputMarker)
+                })
+            }
+            this.map.fitBounds(bounds)
+        },
+
+        showResultMap (locations) {
+            const middleLatLng = this.getMiddleLatLng(locations)
+            this.showResultMarker(middleLatLng)
+            this.showInputMarkers(locations)
+        },
+
+        showResult () {
+            this.geocodePlaces(this.showResultMap)
         }
     }
 }
@@ -157,7 +184,7 @@ main {
 }
 
 .btn {
-    width: 150px;   
+    width: 150px;
 }
 
 .pageMain_inputs {
