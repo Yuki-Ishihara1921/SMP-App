@@ -17,11 +17,11 @@
                     </div>
                     <p class="my-2">
                         <span class="text-danger h6">
-                            <img src="../assets/redDot.png" alt="赤マーカー">
+                            <img src="../assets/redMarker.png" alt="赤マーカー">
                             中間地点
                         </span>
                         <span class="text-primary h6">
-                            <img src="../assets/blueDot.png" alt="青マーカー">
+                            <img src="../assets/blueMarker.png" alt="青マーカー">
                             検索地点
                         </span>
                     </p>
