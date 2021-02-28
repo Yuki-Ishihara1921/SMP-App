@@ -46,7 +46,7 @@ export default {
     },
     async mounted () {
         this.google = await GoogleMapsApiLoader({
-            apiKey: 'AIzaSyAVAtOVuGSgxhQN-TYOk7GjeVJrPFnHzWI' //AIzaSyCKv-OGMnQLgYEUl75HsFZtbmlcdF0TdY4
+            apiKey: ''
         })
         this.map = new this.google.maps.Map(document.getElementById('map'), {
             center: {
