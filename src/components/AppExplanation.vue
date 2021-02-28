@@ -13,15 +13,15 @@
                         2~4ヶ所の中間地点を表示
                     </h5>
                     <div class="modal__content--image">
-                        <img class="w-100" src="../assets/exampleMap.png" alt="サンプル画像">
+                        <img class="w-100" src="../assets/images/exampleMap.png" alt="サンプル画像">
                     </div>
                     <p class="my-2">
                         <span class="text-danger h6">
-                            <img src="../assets/redMarker.png" alt="赤マーカー">
+                            <img src="../assets/images/redMarker.png" alt="赤マーカー">
                             中間地点
                         </span>
                         <span class="text-primary h6">
-                            <img src="../assets/blueMarker.png" alt="青マーカー">
+                            <img src="../assets/images/blueMarker.png" alt="青マーカー">
                             検索地点
                         </span>
                     </p>
