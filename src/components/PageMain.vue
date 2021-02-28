@@ -57,6 +57,10 @@ export default {
         })
     },
     methods: {
+        closeLoading () {
+            this.isLoading = false
+        },
+
         getInputPlaces () {
             const inputPlaces = []
             const inputs = ['input1', 'input2', 'input3', 'input4']
@@ -69,14 +73,14 @@ export default {
             return inputPlaces
         },
 
-        geocodePlaces (showResult) {
-            const locations = []
+        geocodePlaces (showResult, closeLoading) {
             const places = this.getInputPlaces()
-            const geocoder = new this.google.maps.Geocoder()
             if (places.length < 2) {
                 alert("２つ以上入力して下さい。")
                 return false
             }
+            const locations = []
+            const geocoder = new this.google.maps.Geocoder()
             this.isLoading = true
             for (let i = 0; i < places.length; i++) {
                 geocoder.geocode({address: places[i]}, function (results, status) {
@@ -91,6 +95,7 @@ export default {
                         showResult(locations)
                     } else {
                         alert("「" + places[i] + "」" + "は正しい地名ではありません。")
+                        closeLoading()
                         return false
                     }
                 })
@@ -134,7 +139,7 @@ export default {
                 content: '<span style="color: red; font-size: 15px; font-weight: bold;">中間地点</span>'
             })
             resultInfoWindow.open(this.map, resultMarker)
-            resultMarker.addListener('click', function() {
+            resultMarker.addListener('click', function () {
                 resultInfoWindow.open(this.map, resultMarker)
             })
         },
@@ -155,7 +160,7 @@ export default {
 
                 // 青マーカークリック時に検索地点名表示
                 const inputsInfoWindow = new googleMap.InfoWindow()
-                inputMarker.addListener('click', function() {
+                inputMarker.addListener('click', function () {
                     inputsInfoWindow.setContent(
                         '<a href=http://www.google.com/search?q=' + locations[i].place + ' target="_blank" style="font-weight: bold">' + locations[i].place
                     )
@@ -169,11 +174,11 @@ export default {
             const middleLatLng = this.getMiddleLatLng(locations)
             this.showResultMarker(middleLatLng)
             this.showInputMarkers(locations)
-            this.isLoading = false
+            this.closeLoading()
         },
 
         showResult () {
-            this.geocodePlaces(this.showResultMap)
+            this.geocodePlaces(this.showResultMap, this.closeLoading)
         }
     }
 }
