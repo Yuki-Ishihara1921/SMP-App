@@ -23,6 +23,7 @@
             <div id="map" />
         </div>
     </main>
+    <app-loading v-if="isLoading" />
 </template>
 
 <script>
@@ -30,21 +31,22 @@ import GoogleMapsApiLoader from 'google-maps-api-loader'
 import { BIconSearch } from 'bootstrap-icons-vue'
 import TheHeader from './TheHeader'
 import TextInput from './TextInput'
+import AppLoading from './AppLoading'
 
 export default {
     components: {
-       TheHeader, TextInput, BIconSearch
+       TheHeader, TextInput, BIconSearch, AppLoading
     },
     data () {
         return {
             google: null,
             map: null,
-            middleLatLng: {}
+            isLoading: false
         }
     },
     async mounted () {
         this.google = await GoogleMapsApiLoader({
-            apiKey: ''
+            apiKey: 'AIzaSyAVAtOVuGSgxhQN-TYOk7GjeVJrPFnHzWI' //AIzaSyCKv-OGMnQLgYEUl75HsFZtbmlcdF0TdY4
         })
         this.map = new this.google.maps.Map(document.getElementById('map'), {
             center: {
@@ -75,6 +77,7 @@ export default {
                 alert("２つ以上入力して下さい。")
                 return false
             }
+            this.isLoading = true
             for (let i = 0; i < places.length; i++) {
                 geocoder.geocode({address: places[i]}, function (results, status) {
                     if (status === this.google.maps.GeocoderStatus.OK) {
@@ -166,6 +169,7 @@ export default {
             const middleLatLng = this.getMiddleLatLng(locations)
             this.showResultMarker(middleLatLng)
             this.showInputMarkers(locations)
+            this.isLoading = false
         },
 
         showResult () {
