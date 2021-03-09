@@ -4,12 +4,16 @@
         <div class="pageMain_inputs container">
             <div class="d-flex py-3">
                 <h6 class="m-auto font-weight-bold text-primary">
-                    <span><BIconSearch /></span>
-                    地名・住所を入力
+                    <span>
+                        <BIconPencilFill />
+                        地名・住所を入力
+                    </span>
                 </h6>
                 <button class="btn btn-info btn-sm px-3" @click="showResult()">
-                    <span><BIconSearch /></span>
-                    検索
+                    <span>
+                        <BIconSearch />
+                        検索
+                    </span>
                 </button>
             </div>
             <div class="row">
@@ -28,15 +32,15 @@
 
 <script>
 import GoogleMapsApiLoader from 'google-maps-api-loader'
-import { BIconSearch } from 'bootstrap-icons-vue'
+import AppLoading from './AppLoading'
 import TheHeader from './TheHeader'
 import TextInput from './TextInput'
-import AppLoading from './AppLoading'
+import { googleApiKey } from '../google/config'
+import { BIconPencilFill, BIconSearch } from 'bootstrap-icons-vue'
 
 export default {
-    components: {
-       TheHeader, TextInput, BIconSearch, AppLoading
-    },
+    components: { AppLoading, BIconPencilFill, BIconSearch, TheHeader, TextInput },
+
     data () {
         return {
             google: null,
@@ -46,7 +50,7 @@ export default {
     },
     async mounted () {
         this.google = await GoogleMapsApiLoader({
-            apiKey: ''
+            apiKey: googleApiKey
         })
         this.map = new this.google.maps.Map(document.getElementById('map'), {
             center: {
