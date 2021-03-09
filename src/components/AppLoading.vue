@@ -1,6 +1,6 @@
 <template>
     <div class="appLoading_container">
-        <div class="spinner-border" role="status">
+        <div class="spinner-border text-info" role="status">
             <span class="sr-only">Loading...</span>
         </div>
         <p class="py-2 text-info">{{text}}</p>
