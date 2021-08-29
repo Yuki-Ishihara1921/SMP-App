@@ -88,7 +88,7 @@ export default {
             this.isLoading = true
             for (let i = 0; i < places.length; i++) {
                 geocoder.geocode({address: places[i]}, function (results, status) {
-                    if (status === this.google.maps.GeocoderStatus.OK) {
+                    if (status === 'OK') {
                         const locationData = {
                             place: places[i],
                             address: results[0].formatted_address,
@@ -190,10 +190,10 @@ export default {
 
 <style scoped>
 main {
-  max-width: 900px;
-  margin: auto;
-  padding: 5vh 20px 0;
-  text-align: center;
+    max-width: 900px;
+    margin: auto;
+    padding: 5vh 20px 0;
+    text-align: center;
 }
 
 .btn {
